@@ -1,20 +1,16 @@
 const Token = artifacts.require("MyToken");
+require("dotenv").config({ path: "../.env" });
 
-var chai = require("chai");
+var chai = require("./chaisetup");
 const BN = web3.utils.BN; //BN- Big Number
-const chaiBN = require("chai-bn")(BN);
-chai.use(chaiBN);
-
-var chaiAsPromised = require("chai-as-promised");
-chai.use(chaiAsPromised);
-
 const expect = chai.expect;
 
 contract("Token Test", async accounts => {
   const [deployer, recipient, anotherAccount] = accounts;
   let instance;
-  before(async() => {
-    instance = await Token.deployed();
+  beforeEach(async() => {
+    // instance = await Token.deployed(); //uses the data from deploying in migrations
+    instance = await Token.new(process.env.INITIAL_TOKENS); //creates a new deployment
   })
 
   describe("Contract Testing", async() => {
@@ -27,7 +23,7 @@ contract("Token Test", async accounts => {
       // assert.equal(balance.valueOf(), initialSupply.valueOf(), "The balance was not the same");
       
       // eventually- waits for promise to resolve
-      await expect(instance.balanceOf(deployer)).to.eventually.be.a.bignumber.equal(totalSupply);
+      return expect(instance.balanceOf(deployer)).to.eventually.be.a.bignumber.equal(totalSupply);
     });
 
     it("can send tokens from Account 1 to Account 2", async () => {
@@ -38,7 +34,7 @@ contract("Token Test", async accounts => {
       await expect(instance.balanceOf(deployer)).to.eventually.be.a.bignumber.equal(totalSupply);
       await expect(instance.transfer(recipient, sendTokens)).to.eventually.be.fulfilled;
       await expect(instance.balanceOf(deployer)).to.eventually.be.a.bignumber.equal(totalSupply.sub(new BN(sendTokens)));
-      await expect(instance.balanceOf(recipient)).to.eventually.be.a.bignumber.equal(new BN(sendTokens));
+      return expect(instance.balanceOf(recipient)).to.eventually.be.a.bignumber.equal(new BN(sendTokens));
     });
   
     it("is not possible to send token greater than the balance of the account", async () => {
@@ -46,7 +42,7 @@ contract("Token Test", async accounts => {
       await expect(instance.transfer(deployer, new BN(balanceOfAccount+1))).to.eventually.be.rejected;
 
       // check if te balance is still the same
-      await expect(instance.balanceOf(deployer)).to.eventually.be.a.bignumber.equal(balanceOfAccount);
+      return expect(instance.balanceOf(deployer)).to.eventually.be.a.bignumber.equal(balanceOfAccount);
     });
   });
 
@@ -54,3 +50,5 @@ contract("Token Test", async accounts => {
 
 
 // using expect from chai
+// before() is run once before all the tests in a describe
+// beforeEach() is run before each test in a describe

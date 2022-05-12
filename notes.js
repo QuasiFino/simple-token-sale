@@ -12,3 +12,4 @@
 // >geth attach \\.\pipe\geth.ipc
 // >admin.startRPC("localhost",8545) 
 
+// yarn add dotenv
