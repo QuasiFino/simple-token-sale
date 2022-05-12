@@ -8,11 +8,12 @@ const expect = chai.expect;
 
 contract("TokenSale", async(accounts) => {
   const [deployer, recipient, anotherAccount] = accounts;
-  let tokenInstance, tokenSaleInstance;
+  let tokenInstance, tokenSaleInstance, kycInstance;
 
   beforeEach(async() => {
     tokenInstance = await Token.deployed();
     tokenSaleInstance = await TokenSale.deployed();
+    kycInstance = await KycContract.deployed();
   });
 
   it("there should not be any coins in my account", async() => {
@@ -27,6 +28,9 @@ contract("TokenSale", async(accounts) => {
 
   it("should be possible to buy one token by sending one wei to the tokenSale contract", async() => {
     let balanceBeforeAccount = await tokenInstance.balanceOf.call(recipient);
+
+    await expect(tokenSaleInstance.sendTransaction({ from: recipient, value: web3.utils.toWei("1", "wei") })).to.be.rejected;
+    await kycInstance.setKycCompleted(recipient);
 
     await expect(tokenSaleInstance.sendTransaction({ from: recipient, value: web3.utils.toWei("1", "wei") })).to.be.fulfilled;
     return expect(balanceBeforeAccount + 1).to.be.a.bignumber.equal(await tokenInstance.balanceOf.call(recipient));
