@@ -11,34 +11,42 @@ import {
   UPDATE_ACCOUNT
 } from "../ActionTypes";
 
-const connectRequest = () => {
-  return {
-    type: CONNECTION_REQUEST,
-  };
-};
+export const ActionCreators = {
+  connectRequest: () => ({ type: CONNECTION_REQUEST }),
+  connectSuccess: payload => ({ type: CONNECTION_SUCCCESS, payload}),
+  connectFailed: payload => ({ type: CONNECTION_FAILED, payload }),
+  updateAccountRequest: payload => ({ type: UPDATE_ACCOUNT, payload }),
+}
 
-const connectSuccess = (payload) => {
-  return {
-    type: CONNECTION_SUCCCESS,
-    payload,
-  };
-};
+// const connectRequest = () => {
+//   return {
+//     type: CONNECTION_REQUEST,
+//   };
+// };
 
-const connectFailed = (payload) => {
-  return {
-    type: CONNECTION_FAILED,
-    payload,
-  };
-};
+// const connectSuccess = (payload) => {
+//   return {
+//     type: CONNECTION_SUCCCESS,
+//     payload,
+//   };
+// };
 
-const updateAccountRequest = (payload) => {
-  return {
-    type: UPDATE_ACCOUNT,
-    payload,
-  };
-};
+// const connectFailed = (payload) => {
+//   return {
+//     type: CONNECTION_FAILED,
+//     payload,
+//   };
+// };
+
+// const updateAccountRequest = (payload) => {
+//   return {
+//     type: UPDATE_ACCOUNT,
+//     payload,
+//   };
+// };
 
 export const connectBlockchain = () => async dispatch => {
+  const { connectRequest, connectSuccess, connectFailed, updateAccountRequest } = ActionCreators
   dispatch(connectRequest());
   if(window.ethereum) {
     let web3 = new Web3(window.ethereum);
@@ -66,16 +74,24 @@ export const connectBlockchain = () => async dispatch => {
           KycContract.abi,
           NetworkDataKycContract.address
         );
+
+        let bal = await myTokenObj.methods.balanceOf(accounts[0]).call();
+        let kycCompleted = await kycContractObj.methods.kycCompleted(accounts[0]).call();
+
         dispatch(connectSuccess({
           account: accounts[0],
           myToken: myTokenObj,
           myTokenSale: myTokenSaleObj,
           kycContract: kycContractObj,
+          myTokenSaleAddress: NetworkDataMyTokenSale.address,
+          tokenBalance: bal,
+          kycCompleted: kycCompleted,
           web3,
         }));
 
         window.ethereum.on("accountsChanged", (accounts) => {
-          dispatch(updateAccount(accounts[0]));
+          
+          dispatch(updateAccount(accounts[0], bal, kycCompleted));
         });
         window.ethereum.on("chainChanged", () => {
           window.location.reload();
@@ -91,6 +107,7 @@ export const connectBlockchain = () => async dispatch => {
   }
 };
 
-export const updateAccount = (account) => async dispatch => {
-  dispatch(updateAccountRequest({ account: account }));
+export const updateAccount = (account, tokenBalance, kycCompleted) => async dispatch => {
+  const { updateAccountRequest } = ActionCreators;
+  dispatch(updateAccountRequest({ account: account, tokenBalance: tokenBalance, kycCompleted: kycCompleted}));
 };

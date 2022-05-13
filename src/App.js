@@ -6,7 +6,7 @@ import './App.css';
 
 const App = (props) => {
 
-  const { account, myToken, myTokenSale, kycContract, errorMsg, loading } = props.blockchain;
+  const { account, myToken, myTokenSale, kycContract, myTokenSaleAddress, tokenBalance, kycCompleted, errorMsg, loading } = props.blockchain;
   const [kycAddress, setKycAddress] = useState("0x123");
 
   const handleChange = (event) => {
@@ -26,6 +26,11 @@ const App = (props) => {
     }
   }
 
+  const handleBuyTokens = async (event) => {
+    event.preventDefault();
+    await myTokenSale.methods.buyTokens(account).send({ from: account, value: 1, gasPrice: '20000000000' });
+  }
+
   const renderConnect = () => {
     if(
       account === ""
@@ -33,6 +38,7 @@ const App = (props) => {
       || myTokenSale === null
       || kycContract === null
     ) {
+      
       return (
         <button
           onClick={(e) => {
@@ -59,12 +65,22 @@ const App = (props) => {
         <h1>Capuccino Token for StarDucks</h1>
         <h2>Enable your account</h2>
         Address to allow: <input type="text" name="kycAddress" value={kycAddress} onChange={handleChange}/>
-        <button type="button" onClick={handleSubmit}>Add address to Whitelist</button>
+        <button type="button" onClick={handleSubmit} disabled={myToken ? false : true}>Add address to Whitelist</button>
+        <h2>Buy Cappucino-Tokens</h2>
+        {myTokenSale ? (
+          <div>
+            <p>Send Ether to this address: {myTokenSaleAddress}</p>
+            <p>kyc Completed: {(kycCompleted).toString()}</p>
+            <p>You have: {tokenBalance} </p>
+            <button type='button' onClick={handleBuyTokens}>Buy one token</button>
+          </div>
+        ) : null}
+        
       </div>
     );
   }
 
-  // console.log(props.blockchain);
+  console.log(props.blockchain);
   return (
     <div className="App">
       {renderConnect()}

@@ -1,3 +1,4 @@
+import { createSlice } from "@reduxjs/toolkit";
 import { 
   CONNECTION_REQUEST,
   CONNECTION_SUCCCESS,
@@ -12,10 +13,52 @@ const initialState = {
   myTokenSale: null,
   kycContract: null,
   web3: null,
+  myTokenSaleAddress: null,
+  tokenBalance: "",
+  kycCompleted: false,
   errorMsg: "",
 }
 
-const blockchainReducer = (state = initialState, action) => {
+export const blockchainReducer = createSlice({
+  name: 'blockchain',
+  initialState,
+  reducers: {
+    connectRequest: (state, action) => {
+      return { ...state, loading: true };
+    },
+    connectSuccess: (state, action) => {
+      return {
+        ...state,
+        loading: false,
+        account: action.payload.account,
+        myToken: action.payload.myToken,
+        myTokenSale: action.payload.myTokenSale,
+        kycContract: action.payload.kycContract,
+        myTokenSaleAddress: action.payload.myTokenSaleAddress,
+        tokenBalance: action.payload.tokenBalance,
+        kycCompleted: action.payload.kycCompleted,
+        web3: action.payload.web3,
+      };
+    },
+    connectFailed: (state, action) => {
+      return {
+        ...state,
+        loading: false,
+        errorMsg: action.payload,
+      };
+    },
+    updateAccountRequest: (state, action) => {
+      return {
+        ...state,
+        account: action.payload.account,
+        tokenBalance: action.payload.tokenBalance,
+        kycCompleted: action.payload.kycCompleted,
+      };
+    }
+  }
+});
+
+const blockchainReducerold = (state = initialState, action) => {
   switch (action.type) {
     case CONNECTION_REQUEST:
       return {
@@ -30,6 +73,9 @@ const blockchainReducer = (state = initialState, action) => {
         myToken: action.payload.myToken,
         myTokenSale: action.payload.myTokenSale,
         kycContract: action.payload.kycContract,
+        myTokenSaleAddress: action.payload.myTokenSaleAddress,
+        tokenBalance: action.payload.tokenBalance,
+        kycCompleted: action.payload.kycCompleted,
         web3: action.payload.web3,
       }
     case CONNECTION_FAILED:
@@ -42,10 +88,17 @@ const blockchainReducer = (state = initialState, action) => {
       return {
         ...state,
         account: action.payload.account,
+        tokenBalance: action.payload.tokenBalance,
+        kycCompleted: action.payload.kycCompleted,
       };
     default:
       return state;
   }
 };
 
-export default blockchainReducer;
+export default blockchainReducerold;
+
+// to export action
+// export const { connectRequest, connectSuccess, connectFailed, updateAccountRequest } = blockchainReducer.actions;
+// to export reducer
+// export default blockchainReducer.reducer;

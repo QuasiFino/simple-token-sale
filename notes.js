@@ -22,4 +22,10 @@
 // to send eth in ganache network to metamask account
 // >web3.eth.sendTransaction({from: accounts[3], to: "0x5d476D5B00484992d29d7d5E769D68E12e83EF8D", value: web3.utils.toWei("1", "ether")})
 
-// 
+// >yarn add @truffle/hdwallet-provider
+
+// >truffle migrate --network ganache_local
+
+// truffle console --network ganache_local
+
+// >yarn add @reduxjs/toolkit
