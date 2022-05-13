@@ -13,7 +13,6 @@ const initialState = {
   myTokenSale: null,
   kycContract: null,
   web3: null,
-  myTokenSaleAddress: null,
   tokenBalance: "",
   kycCompleted: false,
   errorMsg: "",
@@ -34,7 +33,6 @@ export const blockchainReducer = createSlice({
         myToken: action.payload.myToken,
         myTokenSale: action.payload.myTokenSale,
         kycContract: action.payload.kycContract,
-        myTokenSaleAddress: action.payload.myTokenSaleAddress,
         tokenBalance: action.payload.tokenBalance,
         kycCompleted: action.payload.kycCompleted,
         web3: action.payload.web3,
@@ -73,9 +71,6 @@ const blockchainReducerold = (state = initialState, action) => {
         myToken: action.payload.myToken,
         myTokenSale: action.payload.myTokenSale,
         kycContract: action.payload.kycContract,
-        myTokenSaleAddress: action.payload.myTokenSaleAddress,
-        tokenBalance: action.payload.tokenBalance,
-        kycCompleted: action.payload.kycCompleted,
         web3: action.payload.web3,
       }
     case CONNECTION_FAILED:
@@ -88,8 +83,6 @@ const blockchainReducerold = (state = initialState, action) => {
       return {
         ...state,
         account: action.payload.account,
-        tokenBalance: action.payload.tokenBalance,
-        kycCompleted: action.payload.kycCompleted,
       };
     default:
       return state;

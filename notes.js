@@ -24,8 +24,12 @@
 
 // >yarn add @truffle/hdwallet-provider
 
-// >truffle migrate --network ganache_local
+// >truffle migrate --network ganache_local --reset
 
 // truffle console --network ganache_local
 
 // >yarn add @reduxjs/toolkit
+
+// if there is any problem when installing truffle 
+// run cmd as aminstrator
+// >npm install -g windows-build-tools

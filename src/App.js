@@ -1,13 +1,17 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { connect } from 'react-redux';
 
 import * as actions from './redux/blockchain/blockchainActions';
+import { connectBlockchain } from './redux/blockchain/blockchainActions';
+import { fetchData } from './redux/data/dataActions';
 import './App.css';
 
 const App = (props) => {
 
-  const { account, myToken, myTokenSale, kycContract, myTokenSaleAddress, tokenBalance, kycCompleted, errorMsg, loading } = props.blockchain;
+  const { account, myToken, myTokenSale, kycContract, errorMsg, loading } = props.blockchain;
+  const { kycCompleted, tokenBalance } = props.data;
   const [kycAddress, setKycAddress] = useState("0x123");
+  const [userBalance, setUserBalance] = useState("0");
 
   const handleChange = (event) => {
     const target = event.target;
@@ -29,7 +33,27 @@ const App = (props) => {
   const handleBuyTokens = async (event) => {
     event.preventDefault();
     await myTokenSale.methods.buyTokens(account).send({ from: account, value: 1, gasPrice: '20000000000' });
+    props.fetchData(account);
   }
+
+  // const listenToTokenTransfer = () => {
+  //   myToken.events.Transfer({ to: account }).on("data", async () => {
+  //     let userTokens = await myToken.methods.balanceOf(account).call();
+  //     setUserBalance(userTokens);
+  //   })
+  // }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if(isMounted && account && myToken && myTokenSale && kycContract) {
+      props.fetchData(account);
+    }
+
+    return () => { isMounted = false }
+  }, [account]);
+
+  // console.log(props.data);
 
   const renderConnect = () => {
     if(
@@ -69,9 +93,9 @@ const App = (props) => {
         <h2>Buy Cappucino-Tokens</h2>
         {myTokenSale ? (
           <div>
-            <p>Send Ether to this address: {myTokenSaleAddress}</p>
+            <p>Send Ether to this address: {myTokenSale._address}</p>
             <p>kyc Completed: {(kycCompleted).toString()}</p>
-            <p>You have: {tokenBalance} </p>
+            <p>You have: {tokenBalance} tokens</p>
             <button type='button' onClick={handleBuyTokens}>Buy one token</button>
           </div>
         ) : null}
@@ -80,7 +104,6 @@ const App = (props) => {
     );
   }
 
-  console.log(props.blockchain);
   return (
     <div className="App">
       {renderConnect()}
@@ -92,8 +115,9 @@ const App = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    blockchain: state.blockchain
+    blockchain: state.blockchain,
+    data: state.data
   }
 };
 
-export default connect(mapStateToProps, actions)(App);
+export default connect(mapStateToProps, { connectBlockchain, fetchData })(App);

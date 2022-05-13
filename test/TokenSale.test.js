@@ -33,6 +33,8 @@ contract("TokenSale", async(accounts) => {
     await kycInstance.setKycCompleted(recipient);
 
     await expect(tokenSaleInstance.sendTransaction({ from: recipient, value: web3.utils.toWei("1", "wei") })).to.be.fulfilled;
-    return expect(balanceBeforeAccount + 1).to.be.a.bignumber.equal(await tokenInstance.balanceOf.call(recipient));
+    return expect(tokenInstance.balanceOf.call(recipient)).to.eventually.be.a.bignumber.equal(balanceBeforeAccount.add(new BN(1)));
+    // or
+    // return expect(balanceBeforeAccount + 1).to.be.a.bignumber.equal(await tokenInstance.balanceOf.call(recipient));
   });
 });
