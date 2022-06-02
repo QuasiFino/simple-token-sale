@@ -19,7 +19,7 @@ module.exports = {
     },
     rinkeby: {
       provider: function() {
-        return new HDWalletProvider(process.env.MNEMONIC, "https://rinkeby.infura.io/v3/65bda69285c74fb494e2cf754fae53ee", MetaMaskAccountIndex)
+        return new HDWalletProvider(process.env.MNEMONIC, "https://rinkeby.infura.io/https://rinkeby.infura.io/INFURA_KEY", MetaMaskAccountIndex)
       },
       network_id: 4
     }
